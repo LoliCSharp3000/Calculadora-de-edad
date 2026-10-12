@@ -2,13 +2,30 @@ package maralboran;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         LocalDate today = LocalDate.now();
-        int year, month, day, edad;
+        LocalDate client = pedirFecha(sc, today);
+        try {
+            if (client == null) {
+                throw new IllegalArgumentException("La fecha esta incorrecta");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        
+        Period period = Period.between(client, today);
+        System.out.println("Tienes " + period.getYears() + " años, " + period.getMonths() + " meses y " + period.getDays() + " dias.");
+        System.out.println("Has vivido " + ChronoUnit.DAYS.between(client, today) + " dias.");
+        sc.close();
+    }
+
+    public static LocalDate pedirFecha(Scanner sc, LocalDate today){
+        int year, month, day;
         System.out.println("escribe tu año de nacimiento:");
         year = sc.nextInt();
         System.out.println("escribe tu mes de nacimiento:");
@@ -17,18 +34,14 @@ public class Main {
         day = sc.nextInt();
         try {
             LocalDate client = LocalDate.of(year, month, day);
-            if(client.isAfter(today)){
-                System.out.println("la fecha no puede ser futura");
-            }else{
-                Period period = Period.between(client, today);
-                edad = period.getYears();
-                System.out.println("Tienes " + edad + " años");
-            }
+            return client.isAfter(today) ? lanzarError() : client;
         } catch (Exception e) {
-            
-            
-            System.out.println("Escribiste la edad mal");
+            System.out.println(e);
         }
-        sc.close();
+        return null;
     }
+
+    private static LocalDate lanzarError() {
+    throw new IllegalArgumentException("La fecha no puede ser futura");
+}
 }
